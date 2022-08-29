@@ -6,6 +6,7 @@ struct EmojiArtDocumentView: View {
     }
 
     @ObservedObject var documentViewModel: EmojiArtViewModel
+    @State private var selectedEmojis = Set<EmojiArtModel.Emoji>()
 
     let testEmojis = "😀😷🦠💉👻👀🐶🌲🌎🌞🔥🍎⚽️🚗🚓🚲🛩🚁🚀🛸🏠⌚️🎁🗝🔐❤️⛔️❌❓✅⚠️🎶➕➖🏳️"
 
@@ -22,17 +23,27 @@ struct EmojiArtDocumentView: View {
                 Color.white.overlay(
                     OptionalImage(uiImage: documentViewModel.backgroudImage)
                         .scaleEffect(zoomScale)
-                        .position(convertFromEmojiCoordinates((0,0), in: geometry))
+                        .position(convertFromEmojiCoordinates((0, 0), in: geometry))
                 )
                 .gesture(doubleTapToZoom(in: geometry.size))
                 if documentViewModel.backgroundImageFetchStatus == .fetching {
                     ProgressView().scaleEffect(2)
                 } else {
                     ForEach(documentViewModel.emojis) { emoji in
-                        Text(emoji.text)
-                            .font(.system(size: fontSize(for: emoji)))
-                            .scaleEffect(zoomScale)
-                            .position(position(for: emoji, in: geometry))
+                        ZStack {
+                            Text(emoji.text)
+                                .font(.system(size: fontSize(for: emoji)))
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(lineWidth: 1)
+                                .foregroundColor(.blue)
+                                .frame(width: CGFloat(emoji.size), height: CGFloat(emoji.size))
+                                .opacity(selectedEmojis.contains(emoji) ? 1 : 0)
+                        }
+                        .scaleEffect(zoomScale)
+                        .position(position(for: emoji, in: geometry))
+                        .onTapGesture {
+                            didSelect(emoji)
+                        }
                     }
                 }
             }
@@ -47,6 +58,19 @@ struct EmojiArtDocumentView: View {
     var palette: some View {
         ScrollingEmojisView(emojis: testEmojis)
             .font(.system(size: Constants.defaultEmojiFontSize))
+    }
+
+    private func didSelect(_ emoji: EmojiArtModel.Emoji) {
+        print("\(emoji.text) emoji has been selected")
+
+        guard !selectedEmojis.contains(emoji) else {
+            selectedEmojis.remove(emoji)
+            print(selectedEmojis.count)
+            return
+        }
+
+        selectedEmojis.insert(emoji)
+        print(selectedEmojis.count)
     }
 
     private func fontSize(for emoji: EmojiArtModel.Emoji) -> CGFloat {
