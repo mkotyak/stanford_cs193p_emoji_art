@@ -24,4 +24,8 @@ struct EmojiArtModel {
     mutating func addEmoji(_ text: String, at location: (x: Int, y: Int), size: Int) {
         emojis.append(Emoji(text: text, x: location.x, y: location.y, size: size))
     }
+    
+    mutating func remove(_ emoji: EmojiArtModel.Emoji) {
+        emojis.remove(emoji)
+    }
 }

@@ -26,7 +26,9 @@ struct EmojiArtDocumentView: View {
                         .scaleEffect(zoomScale)
                         .position(convertFromEmojiCoordinates((0, 0), in: geometry))
                 )
-                .gesture(doubleTapToZoom(in: geometry.size).exclusively(before: singleTapToResetSelection()))
+                .gesture(doubleTapToZoom(in: geometry.size)
+                    .exclusively(before: singleTapToResetSelection())
+                )
                 if documentViewModel.backgroundImageFetchStatus == .fetching {
                     ProgressView().scaleEffect(2)
                 } else {
@@ -48,6 +50,10 @@ struct EmojiArtDocumentView: View {
                         .onTapGesture {
                             didSelect(emoji)
                         }
+                        .onLongPressGesture(perform: {
+                            selectionCheck(for: emoji)
+                            documentViewModel.remove(emoji)
+                        })
                     }
                 }
             }
@@ -63,18 +69,25 @@ struct EmojiArtDocumentView: View {
         ScrollingEmojisView(emojis: testEmojis)
             .font(.system(size: Constants.defaultEmojiFontSize))
     }
+    
+    private func selectionCheck(for emoji: EmojiArtModel.Emoji) {
+        if selectedEmojis.contains(emoji) {
+            selectedEmojis.remove(emoji)
+            debugPrint("Selected emojis count after removing: \(selectedEmojis.count)")
+        }
+    }
 
     private func didSelect(_ emoji: EmojiArtModel.Emoji) {
         debugPrint("\(emoji.text) emoji has been selected")
 
         guard !selectedEmojis.contains(emoji) else {
             selectedEmojis.remove(emoji)
-            debugPrint(selectedEmojis.count)
+            debugPrint("Selected emojis count unselection: \(selectedEmojis.count)")
             return
         }
 
         selectedEmojis.insert(emoji)
-        debugPrint(selectedEmojis.count)
+        debugPrint("Selected emojis count after insertion: \(selectedEmojis.count)")
     }
 
     private func fontSize(for emoji: EmojiArtModel.Emoji) -> CGFloat {
