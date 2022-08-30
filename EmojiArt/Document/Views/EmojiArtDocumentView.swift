@@ -6,7 +6,7 @@ struct EmojiArtDocumentView: View {
     }
 
     @ObservedObject var documentViewModel: EmojiArtViewModel
-    @State private var selectedEmojis = Set<EmojiArtModel.Emoji>()
+    @State private var selectedEmojis: Set<EmojiArtModel.Emoji> = .init()
 
     let testEmojis = "😀😷🦠💉👻👀🐶🌲🌎🌞🔥🍎⚽️🚗🚓🚲🛩🚁🚀🛸🏠⌚️🎁🗝🔐❤️⛔️❌❓✅⚠️🎶➕➖🏳️"
 
@@ -61,16 +61,16 @@ struct EmojiArtDocumentView: View {
     }
 
     private func didSelect(_ emoji: EmojiArtModel.Emoji) {
-        print("\(emoji.text) emoji has been selected")
+        debugPrint("\(emoji.text) emoji has been selected")
 
         guard !selectedEmojis.contains(emoji) else {
             selectedEmojis.remove(emoji)
-            print(selectedEmojis.count)
+            debugPrint(selectedEmojis.count)
             return
         }
 
         selectedEmojis.insert(emoji)
-        print(selectedEmojis.count)
+        debugPrint(selectedEmojis.count)
     }
 
     private func fontSize(for emoji: EmojiArtModel.Emoji) -> CGFloat {
