@@ -81,4 +81,8 @@ class EmojiArtViewModel: ObservableObject {
             )
         }
     }
+    
+    func remove(_ emoji: EmojiArtModel.Emoji) {
+        emojiArtModel.remove(emoji)
+    }
 }

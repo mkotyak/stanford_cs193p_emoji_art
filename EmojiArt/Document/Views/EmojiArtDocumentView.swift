@@ -3,6 +3,7 @@ import SwiftUI
 struct EmojiArtDocumentView: View {
     enum Constants {
         static let defaultEmojiFontSize: CGFloat = 40
+        static let frameScale: CGFloat = 1.2
     }
 
     @ObservedObject var documentViewModel: EmojiArtViewModel
@@ -25,7 +26,9 @@ struct EmojiArtDocumentView: View {
                         .scaleEffect(zoomScale)
                         .position(convertFromEmojiCoordinates((0, 0), in: geometry))
                 )
-                .gesture(doubleTapToZoom(in: geometry.size))
+                .gesture(doubleTapToZoom(in: geometry.size)
+                    .exclusively(before: singleTapToResetSelection())
+                )
                 if documentViewModel.backgroundImageFetchStatus == .fetching {
                     ProgressView().scaleEffect(2)
                 } else {
@@ -33,10 +36,13 @@ struct EmojiArtDocumentView: View {
                         ZStack {
                             Text(emoji.text)
                                 .font(.system(size: fontSize(for: emoji)))
-                            RoundedRectangle(cornerRadius: 10)
+                            RoundedRectangle(cornerRadius: 5)
                                 .stroke(lineWidth: 1)
                                 .foregroundColor(.blue)
-                                .frame(width: CGFloat(emoji.size), height: CGFloat(emoji.size))
+                                .frame(
+                                    width: CGFloat(emoji.size) * Constants.frameScale,
+                                    height: CGFloat(emoji.size) * Constants.frameScale
+                                )
                                 .opacity(selectedEmojis.contains(emoji) ? 1 : 0)
                         }
                         .scaleEffect(zoomScale)
@@ -44,6 +50,10 @@ struct EmojiArtDocumentView: View {
                         .onTapGesture {
                             didSelect(emoji)
                         }
+                        .onLongPressGesture(perform: {
+                            unselect(emoji)
+                            documentViewModel.remove(emoji)
+                        })
                     }
                 }
             }
@@ -59,18 +69,25 @@ struct EmojiArtDocumentView: View {
         ScrollingEmojisView(emojis: testEmojis)
             .font(.system(size: Constants.defaultEmojiFontSize))
     }
+    
+    private func unselect(_ emoji: EmojiArtModel.Emoji) {
+        if selectedEmojis.contains(emoji) {
+            selectedEmojis.remove(emoji)
+            debugPrint("Selected emojis count after removing: \(selectedEmojis.count)")
+        }
+    }
 
     private func didSelect(_ emoji: EmojiArtModel.Emoji) {
         debugPrint("\(emoji.text) emoji has been selected")
 
         guard !selectedEmojis.contains(emoji) else {
             selectedEmojis.remove(emoji)
-            debugPrint(selectedEmojis.count)
+            debugPrint("Selected emojis count unselection: \(selectedEmojis.count)")
             return
         }
 
         selectedEmojis.insert(emoji)
-        debugPrint(selectedEmojis.count)
+        debugPrint("Selected emojis count after insertion: \(selectedEmojis.count)")
     }
 
     private func fontSize(for emoji: EmojiArtModel.Emoji) -> CGFloat {
@@ -139,6 +156,15 @@ struct EmojiArtDocumentView: View {
             }
             .onEnded { finalDragGestureValue in
                 steadyStatePanOffset = steadyStatePanOffset + (finalDragGestureValue.translation / zoomScale)
+            }
+    }
+
+    // MARK: - Tapping
+
+    private func singleTapToResetSelection() -> some Gesture {
+        TapGesture(count: 1)
+            .onEnded {
+                selectedEmojis.removeAll()
             }
     }
 
