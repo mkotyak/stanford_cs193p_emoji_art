@@ -69,12 +69,14 @@ struct EmojiArtDocumentView: View {
         ScrollingEmojisView(emojis: testEmojis)
             .font(.system(size: Constants.defaultEmojiFontSize))
     }
-    
+
     private func unselect(_ emoji: EmojiArtModel.Emoji) {
-        if selectedEmojis.contains(emoji) {
-            selectedEmojis.remove(emoji)
-            debugPrint("Selected emojis count after removing: \(selectedEmojis.count)")
+        guard selectedEmojis.contains(emoji) else {
+            return
         }
+
+        selectedEmojis.remove(emoji)
+        debugPrint("Selected emojis count after removing: \(selectedEmojis.count)")
     }
 
     private func didSelect(_ emoji: EmojiArtModel.Emoji) {
