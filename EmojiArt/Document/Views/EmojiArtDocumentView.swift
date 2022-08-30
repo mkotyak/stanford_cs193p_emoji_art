@@ -51,7 +51,7 @@ struct EmojiArtDocumentView: View {
                             didSelect(emoji)
                         }
                         .onLongPressGesture(perform: {
-                            selectionCheck(for: emoji)
+                            unselect(emoji)
                             documentViewModel.remove(emoji)
                         })
                     }
@@ -70,7 +70,7 @@ struct EmojiArtDocumentView: View {
             .font(.system(size: Constants.defaultEmojiFontSize))
     }
     
-    private func selectionCheck(for emoji: EmojiArtModel.Emoji) {
+    private func unselect(_ emoji: EmojiArtModel.Emoji) {
         if selectedEmojis.contains(emoji) {
             selectedEmojis.remove(emoji)
             debugPrint("Selected emojis count after removing: \(selectedEmojis.count)")
