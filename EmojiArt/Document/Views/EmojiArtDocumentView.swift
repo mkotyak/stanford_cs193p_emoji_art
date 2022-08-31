@@ -23,7 +23,7 @@ struct EmojiArtDocumentView: View {
             ZStack {
                 Color.white.overlay(
                     OptionalImage(uiImage: documentViewModel.backgroudImage)
-                        .scaleEffect(zoomScale)
+                        .scaleEffect(globalZoomScale)
                         .position(convertFromEmojiCoordinates((0, 0), in: geometry))
                 )
                 .gesture(doubleTapToZoom(in: geometry.size)
@@ -45,7 +45,7 @@ struct EmojiArtDocumentView: View {
                                 )
                                 .opacity(selectedEmojis.contains(emoji) ? 1 : 0)
                         }
-                        .scaleEffect(zoomScale)
+                        .scaleEffect(globalZoomScale)
                         .position(position(for: emoji, in: geometry))
                         .onTapGesture {
                             didSelect(emoji)
@@ -69,12 +69,14 @@ struct EmojiArtDocumentView: View {
         ScrollingEmojisView(emojis: testEmojis)
             .font(.system(size: Constants.defaultEmojiFontSize))
     }
-    
+
     private func unselect(_ emoji: EmojiArtModel.Emoji) {
-        if selectedEmojis.contains(emoji) {
-            selectedEmojis.remove(emoji)
-            debugPrint("Selected emojis count after removing: \(selectedEmojis.count)")
+        guard selectedEmojis.contains(emoji) else {
+            return
         }
+
+        selectedEmojis.remove(emoji)
+        debugPrint("Selected emojis count after removing: \(selectedEmojis.count)")
     }
 
     private func didSelect(_ emoji: EmojiArtModel.Emoji) {
@@ -95,24 +97,29 @@ struct EmojiArtDocumentView: View {
     }
 
     private func position(for emoji: EmojiArtModel.Emoji, in geometry: GeometryProxy) -> CGPoint {
-        convertFromEmojiCoordinates((emoji.x, emoji.y), in: geometry)
+        debugPrint(emoji)
+        debugPrint(globalZoomScale)
+        return convertFromEmojiCoordinates((emoji.x, emoji.y), in: geometry)
     }
 
     private func convertToEmojiCoordinates(_ location: CGPoint, in geometry: GeometryProxy) -> (x: Int, y: Int) {
         let center = geometry.frame(in: .local).center
         let location = CGPoint(
-            x: (location.x - panOffset.width - center.x) / zoomScale,
-            y: (location.y - panOffset.height - center.y) / zoomScale
+            x: (location.x - panOffset.width - center.x) / globalZoomScale,
+            y: (location.y - panOffset.height - center.y) / globalZoomScale
         )
         return (Int(location.x), Int(location.y))
     }
 
     private func convertFromEmojiCoordinates(_ location: (x: Int, y: Int), in geometry: GeometryProxy) -> CGPoint {
         let center = geometry.frame(in: .local).center
-        return CGPoint(
-            x: center.x + CGFloat(location.x) * zoomScale + panOffset.width,
-            y: center.y + CGFloat(location.y) * zoomScale + panOffset.height
+        let point = CGPoint(
+            x: center.x + CGFloat(location.x) * globalZoomScale + panOffset.width,
+            y: center.y + CGFloat(location.y) * globalZoomScale + panOffset.height
         )
+        debugPrint("CENTER:", center)
+        debugPrint("POINT:", point)
+        return point
     }
 
     private func drop(providers: [NSItemProvider], at location: CGPoint, in geometry: GeometryProxy) -> Bool {
@@ -132,7 +139,7 @@ struct EmojiArtDocumentView: View {
                     documentViewModel.addEmoji(
                         String(emoji),
                         at: convertToEmojiCoordinates(location, in: geometry),
-                        size: Constants.defaultEmojiFontSize / zoomScale
+                        size: Constants.defaultEmojiFontSize / globalZoomScale
                     )
                 }
             }
@@ -146,16 +153,16 @@ struct EmojiArtDocumentView: View {
     @GestureState private var gesturePanOffset: CGSize = .zero
 
     private var panOffset: CGSize {
-        (steadyStatePanOffset + gesturePanOffset) * zoomScale
+        (steadyStatePanOffset + gesturePanOffset) * globalZoomScale
     }
 
     private func panGesture() -> some Gesture {
         DragGesture()
             .updating($gesturePanOffset) { latestDragGestureValue, gesturePanOffset, _ in
-                gesturePanOffset = latestDragGestureValue.translation / zoomScale
+                gesturePanOffset = latestDragGestureValue.translation / globalZoomScale
             }
             .onEnded { finalDragGestureValue in
-                steadyStatePanOffset = steadyStatePanOffset + (finalDragGestureValue.translation / zoomScale)
+                steadyStatePanOffset = steadyStatePanOffset + (finalDragGestureValue.translation / globalZoomScale)
             }
     }
 
@@ -170,20 +177,30 @@ struct EmojiArtDocumentView: View {
 
     // MARK: - Zooming
 
-    @State private var steadyStateZoomScale: CGFloat = 1
+    @State private var globalSteadyStateZoomScale: CGFloat = 1
     @GestureState private var gestureZoomScale: CGFloat = 1
 
-    private var zoomScale: CGFloat {
-        steadyStateZoomScale * gestureZoomScale
+    private var globalZoomScale: CGFloat {
+        globalSteadyStateZoomScale * gestureZoomScale
     }
 
     private func zoomGesture() -> some Gesture {
         MagnificationGesture()
             .updating($gestureZoomScale) { latestGestureScale, gestureZoomScale, _ in
-                gestureZoomScale = latestGestureScale
+                if selectedEmojis.isEmpty {
+                    gestureZoomScale = latestGestureScale
+                } else {
+                    selectedEmojis.forEach { emoji in
+                        documentViewModel.scaleEmoji(emoji, by: latestGestureScale)
+                    }
+                }
             }
             .onEnded { gestureScaleAtTheEnd in
-                steadyStateZoomScale *= gestureScaleAtTheEnd
+                if selectedEmojis.isEmpty {
+                    globalSteadyStateZoomScale *= gestureScaleAtTheEnd
+                } else {
+                    selectedEmojis.removeAll()
+                }
             }
     }
 
@@ -206,10 +223,12 @@ struct EmojiArtDocumentView: View {
             let hZoom = size.width / image.size.width
             let vZoom = size.height / image.size.height
             steadyStatePanOffset = .zero
-            steadyStateZoomScale = min(hZoom, vZoom)
+            globalSteadyStateZoomScale = min(hZoom, vZoom)
         }
     }
 }
+
+// MARK: - Preview
 
 struct EmojiArtDocumentView_Previews: PreviewProvider {
     static var previews: some View {
