@@ -5,8 +5,10 @@ struct EmojiArtModel {
         let id = UUID()
         let text: String
         var x: Int // offset from the center
-        var y: Int // offset from the center 
+        var y: Int // offset from the center
         var size: Int
+//        var originalSize: Int
+//        var scale: Float = 1
         
         fileprivate init(text: String, x: Int, y: Int, size: Int) {
             self.text = text
@@ -14,6 +16,10 @@ struct EmojiArtModel {
             self.y = y
             self.size = size
         }
+        
+//        var size: Int {
+//            Int(Float(originalSize) * scale)
+//        }
     }
     
     var background: Background = .blank
@@ -22,7 +28,14 @@ struct EmojiArtModel {
     init() {}
     
     mutating func addEmoji(_ text: String, at location: (x: Int, y: Int), size: Int) {
-        emojis.append(Emoji(text: text, x: location.x, y: location.y, size: size))
+        emojis.append(
+            Emoji(
+                text: text,
+                x: location.x,
+                y: location.y,
+                size: size
+            )
+        )
     }
     
     mutating func remove(_ emoji: EmojiArtModel.Emoji) {
