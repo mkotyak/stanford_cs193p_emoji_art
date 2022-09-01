@@ -97,8 +97,8 @@ struct EmojiArtDocumentView: View {
     }
 
     private func position(for emoji: EmojiArtModel.Emoji, in geometry: GeometryProxy) -> CGPoint {
-        debugPrint(emoji)
-        debugPrint(globalZoomScale)
+        debugPrint("EMOJI POSITION: ", emoji)
+        debugPrint("GLOBAL ZOOM SCALE", globalZoomScale)
         return convertFromEmojiCoordinates((emoji.x, emoji.y), in: geometry)
     }
 
@@ -108,6 +108,7 @@ struct EmojiArtDocumentView: View {
             x: (location.x - panOffset.width - center.x) / globalZoomScale,
             y: (location.y - panOffset.height - center.y) / globalZoomScale
         )
+        debugPrint("LOCATION", location)
         return (Int(location.x), Int(location.y))
     }
 
@@ -159,10 +160,21 @@ struct EmojiArtDocumentView: View {
     private func panGesture() -> some Gesture {
         DragGesture()
             .updating($gesturePanOffset) { latestDragGestureValue, gesturePanOffset, _ in
-                gesturePanOffset = latestDragGestureValue.translation / globalZoomScale
+                if selectedEmojis.isEmpty {
+                    gesturePanOffset = latestDragGestureValue.translation / globalZoomScale
+                } else {
+                    selectedEmojis.forEach { emoji in
+                        documentViewModel.moveEmoji(emoji, by: latestDragGestureValue.translation)
+                    }
+                }
             }
             .onEnded { finalDragGestureValue in
-                steadyStatePanOffset = steadyStatePanOffset + (finalDragGestureValue.translation / globalZoomScale)
+                if selectedEmojis.isEmpty {
+                    steadyStatePanOffset =
+                        steadyStatePanOffset + (finalDragGestureValue.translation / globalZoomScale)
+                } else {
+                    selectedEmojis.removeAll()
+                }
             }
     }
 
