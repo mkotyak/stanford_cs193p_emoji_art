@@ -12,8 +12,6 @@ class EmojiArtViewModel: ObservableObject {
     
     init() {
         emojiArtModel = EmojiArtModel()
-//        emojiArtModel.addEmoji("🍟", at: (-200, -100), size: 60)
-//        emojiArtModel.addEmoji("🙁", at: (50, 100), size: 40)
     }
     
     var emojis: [EmojiArtModel.Emoji] {
@@ -68,18 +66,26 @@ class EmojiArtViewModel: ObservableObject {
     }
     
     func moveEmoji(_ emoji: EmojiArtModel.Emoji, by offset: CGSize) {
-        if let index = emojiArtModel.emojis.index(matching: emoji) {
-            emojiArtModel.emojis[index].x += Int(offset.width)
-            emojiArtModel.emojis[index].y += Int(offset.height)
+        guard let index = emojiArtModel.emojis.index(matching: emoji) else {
+            return
         }
+        
+        debugPrint("EMOJI IN MOOVE: ", emoji.x, emoji.y, offset)
+        
+        emojiArtModel.emojis[index].x = emoji.x + Int(offset.width)
+        emojiArtModel.emojis[index].y = emoji.y + Int(offset.height)
     }
     
     func scaleEmoji(_ emoji: EmojiArtModel.Emoji, by scale: CGFloat) {
-        if let index = emojiArtModel.emojis.index(matching: emoji) {
-            emojiArtModel.emojis[index].size = Int(
-                (CGFloat(emojiArtModel.emojis[index].size) * scale).rounded(.toNearestOrAwayFromZero)
-            )
+        guard let index = emojiArtModel.emojis.index(matching: emoji) else {
+            return
         }
+        
+        debugPrint("EMOJI SCALE: ", emoji.size, scale)
+        
+        emojiArtModel.emojis[index].size = Int(
+            (CGFloat(emoji.size) * scale).rounded(.toNearestOrAwayFromZero)
+        )
     }
     
     func remove(_ emoji: EmojiArtModel.Emoji) {
