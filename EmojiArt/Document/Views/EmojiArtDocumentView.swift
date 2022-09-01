@@ -36,6 +36,7 @@ struct EmojiArtDocumentView: View {
                         ZStack {
                             Text(emoji.text)
                                 .font(.system(size: fontSize(for: emoji)))
+                                .gesture(dragSingle(emoji))
                             RoundedRectangle(cornerRadius: 5)
                                 .stroke(lineWidth: 1)
                                 .foregroundColor(.blue)
@@ -175,6 +176,13 @@ struct EmojiArtDocumentView: View {
                 } else {
                     selectedEmojis.removeAll()
                 }
+            }
+    }
+
+    private func dragSingle(_ emoji: EmojiArtModel.Emoji) -> some Gesture {
+        DragGesture()
+            .updating($gesturePanOffset) { latestDragGestureValue, _, _ in
+                documentViewModel.moveEmoji(emoji, by: latestDragGestureValue.translation)
             }
     }
 
