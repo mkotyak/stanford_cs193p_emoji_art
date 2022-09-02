@@ -2,8 +2,24 @@ import Foundation
 import SwiftUI
 
 class EmojiArtViewModel: ObservableObject {
+    private enum Autosave {
+        static let filename = "Autoaved.emojiart"
+        
+        static var url: URL? {
+            let documentDirectory = FileManager.default.urls(
+                for: .documentDirectory,
+                in: .userDomainMask
+            ).first
+            
+            return documentDirectory?.appendingPathComponent(filename)
+        }
+        
+        static let coalesingInterval = 5.0
+    }
+    
     @Published private(set) var emojiArtModel: EmojiArtModel {
         didSet {
+            sceduleAutosave()
             if emojiArtModel.background != oldValue.background {
                 fetchBackgrounfImageDataIfNecessary()
             }
@@ -11,8 +27,16 @@ class EmojiArtViewModel: ObservableObject {
     }
     
     init() {
-        emojiArtModel = EmojiArtModel()
+        if let url = Autosave.url, let autosavedEmojiArtModel = try? EmojiArtModel(url: url) {
+            emojiArtModel = autosavedEmojiArtModel
+            fetchBackgrounfImageDataIfNecessary()
+        } else {
+            emojiArtModel = EmojiArtModel()
+        }
     }
+    
+    @Published var backgroudImage: UIImage?
+    @Published var backgroundImageFetchStatus = BackgroundImageFetchStatus.idle
     
     var emojis: [EmojiArtModel.Emoji] {
         emojiArtModel.emojis
@@ -22,8 +46,35 @@ class EmojiArtViewModel: ObservableObject {
         emojiArtModel.background
     }
     
-    @Published var backgroudImage: UIImage?
-    @Published var backgroundImageFetchStatus = BackgroundImageFetchStatus.idle
+    private var autosaveTimer: Timer?
+    
+    private func sceduleAutosave() {
+        autosaveTimer?.invalidate()
+        autosaveTimer = Timer.scheduledTimer(
+            withTimeInterval: Autosave.coalesingInterval,
+            repeats: false
+        ) { _ in
+            self.autosave()
+        }
+    }
+    
+    private func autosave() {
+        if let url = Autosave.url {
+            save(to: url)
+        }
+    }
+    
+    private func save(to url: URL) {
+        let thisFunction = "\(String(describing: self)).\(#function)"
+        do {
+            let data: Data = try emojiArtModel.json()
+            print("\(thisFunction) json = \(String(data: data, encoding: .utf8) ?? "nil")")
+            try data.write(to: url)
+            print("\(thisFunction) success!")
+        } catch {
+            print("\(thisFunction) error = \(error)")
+        }
+    }
     
     private func fetchBackgrounfImageDataIfNecessary() {
         backgroudImage = nil
