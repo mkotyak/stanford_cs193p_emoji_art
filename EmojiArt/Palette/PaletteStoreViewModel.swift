@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 class PaletteStoreViewModel: ObservableObject {
-    @Published private var palettes = [Palette]() {
+    @Published var palettes = [Palette]() {
         didSet {
             storeInUserDefaults()
         }

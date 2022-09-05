@@ -20,6 +20,9 @@
 		FFEC598628B8B9470064851E /* BackgroundImageFetchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEC598528B8B9470064851E /* BackgroundImageFetchStatus.swift */; };
 		FFF840F928C24BD600F16861 /* PaletteStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF840F828C24BD600F16861 /* PaletteStoreViewModel.swift */; };
 		FFF840FB28C24C6000F16861 /* PaletteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF840FA28C24C6000F16861 /* PaletteModel.swift */; };
+		FFF840FE28C5E11A00F16861 /* PaletteChooser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF840FD28C5E11A00F16861 /* PaletteChooser.swift */; };
+		FFF8410028C5EDE400F16861 /* PaletteEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF840FF28C5EDE400F16861 /* PaletteEditor.swift */; };
+		FFF8410228C635C800F16861 /* PaletteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF8410128C635C800F16861 /* PaletteManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +40,9 @@
 		FFEC598528B8B9470064851E /* BackgroundImageFetchStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundImageFetchStatus.swift; sourceTree = "<group>"; };
 		FFF840F828C24BD600F16861 /* PaletteStoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteStoreViewModel.swift; sourceTree = "<group>"; };
 		FFF840FA28C24C6000F16861 /* PaletteModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteModel.swift; sourceTree = "<group>"; };
+		FFF840FD28C5E11A00F16861 /* PaletteChooser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteChooser.swift; sourceTree = "<group>"; };
+		FFF840FF28C5EDE400F16861 /* PaletteEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteEditor.swift; sourceTree = "<group>"; };
+		FFF8410128C635C800F16861 /* PaletteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,7 +127,6 @@
 			isa = PBXGroup;
 			children = (
 				FFEC596828B764DF0064851E /* EmojiArtDocumentView.swift */,
-				FFEC598128B785F20064851E /* ScrollingEmojisView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -130,8 +135,20 @@
 			isa = PBXGroup;
 			children = (
 				FFF840F828C24BD600F16861 /* PaletteStoreViewModel.swift */,
+				FFF840FC28C5E0B300F16861 /* Views */,
 			);
 			path = Palette;
+			sourceTree = "<group>";
+		};
+		FFF840FC28C5E0B300F16861 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				FFEC598128B785F20064851E /* ScrollingEmojisView.swift */,
+				FFF840FD28C5E11A00F16861 /* PaletteChooser.swift */,
+				FFF840FF28C5EDE400F16861 /* PaletteEditor.swift */,
+				FFF8410128C635C800F16861 /* PaletteManager.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -207,13 +224,16 @@
 				FFEC596928B764DF0064851E /* EmojiArtDocumentView.swift in Sources */,
 				FFEC598228B785F20064851E /* ScrollingEmojisView.swift in Sources */,
 				FFF840F928C24BD600F16861 /* PaletteStoreViewModel.swift in Sources */,
+				FFF8410228C635C800F16861 /* PaletteManager.swift in Sources */,
 				FFEC596728B764DF0064851E /* EmojiArtApp.swift in Sources */,
 				FFEC597E28B7764F0064851E /* UtilityExtensions.swift in Sources */,
 				FFEC597628B767040064851E /* EmojiArtModel.swift in Sources */,
 				FFEC597A28B76BF80064851E /* EmojiArtViewModel.swift in Sources */,
+				FFF840FE28C5E11A00F16861 /* PaletteChooser.swift in Sources */,
 				FFEC597828B76A7C0064851E /* EmojiArtModel.Background.swift in Sources */,
 				FFEC598628B8B9470064851E /* BackgroundImageFetchStatus.swift in Sources */,
 				FFEC598428B8ADEA0064851E /* UtilityViews.swift in Sources */,
+				FFF8410028C5EDE400F16861 /* PaletteEditor.swift in Sources */,
 				FFF840FB28C24C6000F16861 /* PaletteModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

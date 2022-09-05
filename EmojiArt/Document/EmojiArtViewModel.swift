@@ -95,6 +95,9 @@ class EmojiArtViewModel: ObservableObject {
                     if imageData != nil {
                         self?.backgroudImage = UIImage(data: imageData!)
                     }
+                    if self?.backgroudImage == nil {
+                        self?.backgroundImageFetchStatus = .failed(url)
+                    }
                 }
             }
         case .imageData(let data):
