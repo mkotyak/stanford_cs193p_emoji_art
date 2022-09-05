@@ -1,6 +1,7 @@
 import Foundation
 
-enum BackgroundImageFetchStatus {
+enum BackgroundImageFetchStatus: Equatable {
     case idle
-    case fetching 
+    case fetching
+    case failed(URL)
 }

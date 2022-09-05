@@ -9,12 +9,10 @@ struct EmojiArtDocumentView: View {
     @ObservedObject var documentViewModel: EmojiArtViewModel
     @State private var selectedEmojis: Set<EmojiArtModel.Emoji> = .init()
 
-    let testEmojis = "😀😷🦠💉👻👀🐶🌲🌎🌞🔥🍎⚽️🚗🚓🚲🛩🚁🚀🛸🏠⌚️🎁🗝🔐❤️⛔️❌❓✅⚠️🎶➕➖🏳️"
-
     var body: some View {
         VStack(spacing: 0) {
             documentBody
-            palette
+            PaletteChooser(emojiFontSize: Constants.defaultEmojiFontSize)
         }
     }
 
@@ -63,12 +61,30 @@ struct EmojiArtDocumentView: View {
                 drop(providers: providers, at: location, in: geometry)
             }
             .gesture(panGesture().simultaneously(with: zoomGesture()))
+            .alert(item: $alertToShow) { alertToShow in
+                alertToShow.alert()
+            }
+            .onChange(of: documentViewModel.backgroundImageFetchStatus) { status in
+                switch status {
+                case .failed(let url):
+                    showBackgroundImageFetchFailedAlert(url)
+                default:
+                    break
+                }
+            }
         }
     }
 
-    var palette: some View {
-        ScrollingEmojisView(emojis: testEmojis)
-            .font(.system(size: Constants.defaultEmojiFontSize))
+    @State private var alertToShow: IdentifiableAlert?
+
+    private func showBackgroundImageFetchFailedAlert(_ url: URL) {
+        alertToShow = IdentifiableAlert(id: "fetch failed: " + url.absoluteString, alert: {
+            Alert(
+                title: Text("Background Image Fetch"),
+                message: Text("Chouldn't load image from \(url)"),
+                dismissButton: .default(Text("Ok"))
+            )
+        })
     }
 
     private func unselect(_ emoji: EmojiArtModel.Emoji) {
