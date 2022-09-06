@@ -17,10 +17,10 @@ class DocumentViewModel: ObservableObject {
         static let coalesingInterval = 5.0
     }
     
-    @Published private(set) var emojiArtModel: DocumentModel {
+    @Published private(set) var documentModel: DocumentModel {
         didSet {
             sceduleAutosave()
-            if emojiArtModel.background != oldValue.background {
+            if documentModel.background != oldValue.background {
                 fetchBackgrounfImageDataIfNecessary()
             }
         }
@@ -32,19 +32,19 @@ class DocumentViewModel: ObservableObject {
     @Published var backgroundImageFetchStatus = BackgroundImageFetchStatus.idle
     
     var emojis: [DocumentModel.Emoji] {
-        emojiArtModel.emojis
+        documentModel.emojis
     }
     
     var background: DocumentModel.Background {
-        emojiArtModel.background
+        documentModel.background
     }
     
     init() {
         if let url = Autosave.url, let autosavedEmojiArtModel = try? DocumentModel(url: url) {
-            emojiArtModel = autosavedEmojiArtModel
+            documentModel = autosavedEmojiArtModel
             fetchBackgrounfImageDataIfNecessary()
         } else {
-            emojiArtModel = DocumentModel()
+            documentModel = DocumentModel()
         }
     }
     
@@ -67,7 +67,7 @@ class DocumentViewModel: ObservableObject {
     private func save(to url: URL) {
         let thisFunction = "\(String(describing: self)).\(#function)"
         do {
-            let data: Data = try emojiArtModel.json()
+            let data: Data = try documentModel.json()
             print("\(thisFunction) json = \(String(data: data, encoding: .utf8) ?? "nil")")
             try data.write(to: url)
             print("\(thisFunction) success!")
@@ -79,7 +79,7 @@ class DocumentViewModel: ObservableObject {
     private func fetchBackgrounfImageDataIfNecessary() {
         backgroudImage = nil
         
-        switch emojiArtModel.background {
+        switch documentModel.background {
         case .url(let url):
             backgroundImageFetchStatus = .fetching
             
@@ -87,7 +87,7 @@ class DocumentViewModel: ObservableObject {
                 let imageData = try? Data(contentsOf: url)
                 
                 DispatchQueue.main.async { [weak self] in
-                    guard self?.emojiArtModel.background == DocumentModel.Background.url(url) else {
+                    guard self?.documentModel.background == DocumentModel.Background.url(url) else {
                         return
                     }
                     
@@ -110,39 +110,39 @@ class DocumentViewModel: ObservableObject {
     // MARK: - Intent(s)
     
     func setBackground(_ background: DocumentModel.Background) {
-        emojiArtModel.background = background
+        documentModel.background = background
         print("background set to \(background)")
     }
     
     func addEmoji(_ emoji: String, at location: (x: Int, y: Int), size: CGFloat) {
-        emojiArtModel.addEmoji(emoji, at: location, size: Int(size))
+        documentModel.addEmoji(emoji, at: location, size: Int(size))
         print("\(emoji) has been added to \(location.x) : \(location.y) position with \(size) size")
     }
     
     func moveEmoji(_ emoji: DocumentModel.Emoji, by offset: CGSize) {
-        guard let index = emojiArtModel.emojis.index(matching: emoji) else {
+        guard let index = documentModel.emojis.index(matching: emoji) else {
             return
         }
         
         debugPrint("EMOJI IN MOOVE: ", emoji.x, emoji.y, offset)
         
-        emojiArtModel.emojis[index].x = emoji.x + Int(offset.width)
-        emojiArtModel.emojis[index].y = emoji.y + Int(offset.height)
+        documentModel.emojis[index].x = emoji.x + Int(offset.width)
+        documentModel.emojis[index].y = emoji.y + Int(offset.height)
     }
     
     func scaleEmoji(_ emoji: DocumentModel.Emoji, by scale: CGFloat) {
-        guard let index = emojiArtModel.emojis.index(matching: emoji) else {
+        guard let index = documentModel.emojis.index(matching: emoji) else {
             return
         }
         
         debugPrint("EMOJI SCALE: ", emoji.size, scale)
         
-        emojiArtModel.emojis[index].size = Int(
+        documentModel.emojis[index].size = Int(
             (CGFloat(emoji.size) * scale).rounded(.toNearestOrAwayFromZero)
         )
     }
     
     func remove(_ emoji: DocumentModel.Emoji) {
-        emojiArtModel.remove(emoji)
+        documentModel.remove(emoji)
     }
 }
