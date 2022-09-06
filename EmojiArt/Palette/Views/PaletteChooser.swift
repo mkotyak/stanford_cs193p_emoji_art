@@ -1,13 +1,16 @@
 import SwiftUI
 
 struct PaletteChooser: View {
-    var emojiFontSize: CGFloat = 40
-    var emojiFont: Font { .system(size: emojiFontSize) }
-
-    @EnvironmentObject var store: PaletteStoreViewModel
     @State private var chosenPaletteIndex = 0
     @State private var paletteToEdit: Palette?
     @State private var managing = false
+
+    @EnvironmentObject var store: PaletteStoreViewModel
+    var emojiFontSize: CGFloat = 40
+
+    var emojiFont: Font {
+        .system(size: emojiFontSize)
+    }
 
     var body: some View {
         HStack {
@@ -60,6 +63,13 @@ struct PaletteChooser: View {
         }
     }
 
+    var rollTransition: AnyTransition {
+        AnyTransition.asymmetric(
+            insertion: .offset(x: 0, y: emojiFontSize),
+            removal: .offset(x: 0, y: -emojiFontSize)
+        )
+    }
+
     func body(for palette: Palette) -> some View {
         HStack {
             Text(palette.name)
@@ -75,14 +85,10 @@ struct PaletteChooser: View {
             PaletteManager()
         }
     }
-
-    var rollTransition: AnyTransition {
-        AnyTransition.asymmetric(
-            insertion: .offset(x: 0, y: emojiFontSize),
-            removal: .offset(x: 0, y: -emojiFontSize)
-        )
-    }
 }
+
+
+// MARK: - Preview
 
 struct PaletteeChooser_Previews: PreviewProvider {
     static var previews: some View {

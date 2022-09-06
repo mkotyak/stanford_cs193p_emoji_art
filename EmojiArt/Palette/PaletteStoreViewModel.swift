@@ -2,6 +2,10 @@ import Foundation
 import SwiftUI
 
 class PaletteStoreViewModel: ObservableObject {
+    private var userDefaultsKey: String {
+        "PaletteStore:" + name
+    }
+
     @Published var palettes = [Palette]() {
         didSet {
             storeInUserDefaults()
@@ -54,10 +58,6 @@ class PaletteStoreViewModel: ObservableObject {
             )
         }
         debugPrint("Successfully loaded palettes from userDefaults")
-    }
-
-    private var userDefaultsKey: String {
-        "PaletteStore:" + name
     }
 
     private func storeInUserDefaults() {

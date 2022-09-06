@@ -26,14 +26,7 @@ class EmojiArtViewModel: ObservableObject {
         }
     }
     
-    init() {
-        if let url = Autosave.url, let autosavedEmojiArtModel = try? EmojiArtModel(url: url) {
-            emojiArtModel = autosavedEmojiArtModel
-            fetchBackgrounfImageDataIfNecessary()
-        } else {
-            emojiArtModel = EmojiArtModel()
-        }
-    }
+    private var autosaveTimer: Timer?
     
     @Published var backgroudImage: UIImage?
     @Published var backgroundImageFetchStatus = BackgroundImageFetchStatus.idle
@@ -46,7 +39,14 @@ class EmojiArtViewModel: ObservableObject {
         emojiArtModel.background
     }
     
-    private var autosaveTimer: Timer?
+    init() {
+        if let url = Autosave.url, let autosavedEmojiArtModel = try? EmojiArtModel(url: url) {
+            emojiArtModel = autosavedEmojiArtModel
+            fetchBackgrounfImageDataIfNecessary()
+        } else {
+            emojiArtModel = EmojiArtModel()
+        }
+    }
     
     private func sceduleAutosave() {
         autosaveTimer?.invalidate()

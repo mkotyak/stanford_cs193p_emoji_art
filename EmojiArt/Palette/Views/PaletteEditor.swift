@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct PaletteEditor: View {
+    @State private var emojisToAdd = ""
     @Binding var palette: Palette
 
     var body: some View {
@@ -19,22 +20,12 @@ struct PaletteEditor: View {
         }
     }
 
-    @State private var emojisToAdd = ""
-
     var addEmojisSection: some View {
         Section(header: Text("Add emojis")) {
             TextField("", text: $emojisToAdd)
                 .onChange(of: emojisToAdd) { emojis in
                     addEmojis(emojis)
                 }
-        }
-    }
-
-    private func addEmojis(_ emojis: String) {
-        withAnimation {
-            palette.emojis = (emojis + palette.emojis)
-                .filter { $0.isEmoji }
-                .removingDuplicateCharacters
         }
     }
 
@@ -56,7 +47,17 @@ struct PaletteEditor: View {
             .font(.system(size: 40))
         }
     }
+
+    private func addEmojis(_ emojis: String) {
+        withAnimation {
+            palette.emojis = (emojis + palette.emojis)
+                .filter { $0.isEmoji }
+                .removingDuplicateCharacters
+        }
+    }
 }
+
+// MARK: - Preview
 
 struct PaletteEditor_Previews: PreviewProvider {
     static var previews: some View {
