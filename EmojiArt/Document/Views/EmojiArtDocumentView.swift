@@ -6,8 +6,10 @@ struct EmojiArtDocumentView: View {
         static let frameScale: CGFloat = 1.2
     }
 
-    @ObservedObject var documentViewModel: EmojiArtViewModel
+    @State private var alertToShow: IdentifiableAlert?
     @State private var selectedEmojis: Set<EmojiArtModel.Emoji> = .init()
+
+    @ObservedObject var documentViewModel: EmojiArtViewModel
 
     var body: some View {
         VStack(spacing: 0) {
@@ -75,8 +77,6 @@ struct EmojiArtDocumentView: View {
         }
     }
 
-    @State private var alertToShow: IdentifiableAlert?
-
     private func showBackgroundImageFetchFailedAlert(_ url: URL) {
         alertToShow = IdentifiableAlert(id: "fetch failed: " + url.absoluteString, alert: {
             Alert(
@@ -113,6 +113,33 @@ struct EmojiArtDocumentView: View {
         CGFloat(emoji.size)
     }
 
+    private func drop(providers: [NSItemProvider], at location: CGPoint, in geometry: GeometryProxy) -> Bool {
+        var found = providers.loadObjects(ofType: URL.self) { url in
+            documentViewModel.setBackground(.url(url.imageURL))
+        }
+        if !found {
+            found = providers.loadObjects(ofType: UIImage.self) { image in
+                if let data = image.jpegData(compressionQuality: 1.0) {
+                    documentViewModel.setBackground(.imageData(data))
+                }
+            }
+        }
+        if !found {
+            found = providers.loadObjects(ofType: String.self) { string in
+                if let emoji = string.first, emoji.isEmoji {
+                    documentViewModel.addEmoji(
+                        String(emoji),
+                        at: convertToEmojiCoordinates(location, in: geometry),
+                        size: Constants.defaultEmojiFontSize / globalZoomScale
+                    )
+                }
+            }
+        }
+        return found
+    }
+
+    // MARK: - Position
+
     private func position(for emoji: EmojiArtModel.Emoji, in geometry: GeometryProxy) -> CGPoint {
         debugPrint("EMOJI POSITION: ", emoji)
         debugPrint("GLOBAL ZOOM SCALE", globalZoomScale)
@@ -138,31 +165,6 @@ struct EmojiArtDocumentView: View {
         debugPrint("CENTER:", center)
         debugPrint("POINT:", point)
         return point
-    }
-
-    private func drop(providers: [NSItemProvider], at location: CGPoint, in geometry: GeometryProxy) -> Bool {
-        var found = providers.loadObjects(ofType: URL.self) { url in
-            documentViewModel.setBackground(.url(url.imageURL))
-        }
-        if !found {
-            found = providers.loadObjects(ofType: UIImage.self) { image in
-                if let data = image.jpegData(compressionQuality: 1.0) {
-                    documentViewModel.setBackground(.imageData(data))
-                }
-            }
-        }
-        if !found {
-            found = providers.loadObjects(ofType: String.self) { string in
-                if let emoji = string.first, emoji.isEmoji {
-                    documentViewModel.addEmoji(
-                        String(emoji),
-                        at: convertToEmojiCoordinates(location, in: geometry),
-                        size: Constants.defaultEmojiFontSize / globalZoomScale
-                    )
-                }
-            }
-        }
-        return found
     }
 
     // MARK: - Panning

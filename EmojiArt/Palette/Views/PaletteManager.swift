@@ -1,10 +1,9 @@
 import SwiftUI
 
 struct PaletteManager: View {
+    @State private var editMode: EditMode = .inactive
     @EnvironmentObject var store: PaletteStoreViewModel
     @Environment(\.presentationMode) var presentationMode
-
-    @State private var editMode: EditMode = .inactive
 
     var body: some View {
         NavigationView {
@@ -34,7 +33,6 @@ struct PaletteManager: View {
                 }
 
                 ToolbarItem(placement: .navigationBarLeading) {
-                    
                     if presentationMode.wrappedValue.isPresented,
                        UIDevice.current.userInterfaceIdiom != .pad
                     {
@@ -55,6 +53,8 @@ struct PaletteManager: View {
 //            }
 //    }
 }
+
+// MARK: - Preview
 
 struct PaletteManager_Previews: PreviewProvider {
     static var previews: some View {
