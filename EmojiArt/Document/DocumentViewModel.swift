@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-class EmojiArtViewModel: ObservableObject {
+class DocumentViewModel: ObservableObject {
     private enum Autosave {
         static let filename = "Autoaved.emojiart"
         
@@ -17,7 +17,7 @@ class EmojiArtViewModel: ObservableObject {
         static let coalesingInterval = 5.0
     }
     
-    @Published private(set) var emojiArtModel: EmojiArtModel {
+    @Published private(set) var emojiArtModel: DocumentModel {
         didSet {
             sceduleAutosave()
             if emojiArtModel.background != oldValue.background {
@@ -31,20 +31,20 @@ class EmojiArtViewModel: ObservableObject {
     @Published var backgroudImage: UIImage?
     @Published var backgroundImageFetchStatus = BackgroundImageFetchStatus.idle
     
-    var emojis: [EmojiArtModel.Emoji] {
+    var emojis: [DocumentModel.Emoji] {
         emojiArtModel.emojis
     }
     
-    var background: EmojiArtModel.Background {
+    var background: DocumentModel.Background {
         emojiArtModel.background
     }
     
     init() {
-        if let url = Autosave.url, let autosavedEmojiArtModel = try? EmojiArtModel(url: url) {
+        if let url = Autosave.url, let autosavedEmojiArtModel = try? DocumentModel(url: url) {
             emojiArtModel = autosavedEmojiArtModel
             fetchBackgrounfImageDataIfNecessary()
         } else {
-            emojiArtModel = EmojiArtModel()
+            emojiArtModel = DocumentModel()
         }
     }
     
@@ -87,7 +87,7 @@ class EmojiArtViewModel: ObservableObject {
                 let imageData = try? Data(contentsOf: url)
                 
                 DispatchQueue.main.async { [weak self] in
-                    guard self?.emojiArtModel.background == EmojiArtModel.Background.url(url) else {
+                    guard self?.emojiArtModel.background == DocumentModel.Background.url(url) else {
                         return
                     }
                     
@@ -109,7 +109,7 @@ class EmojiArtViewModel: ObservableObject {
     
     // MARK: - Intent(s)
     
-    func setBackground(_ background: EmojiArtModel.Background) {
+    func setBackground(_ background: DocumentModel.Background) {
         emojiArtModel.background = background
         print("background set to \(background)")
     }
@@ -119,7 +119,7 @@ class EmojiArtViewModel: ObservableObject {
         print("\(emoji) has been added to \(location.x) : \(location.y) position with \(size) size")
     }
     
-    func moveEmoji(_ emoji: EmojiArtModel.Emoji, by offset: CGSize) {
+    func moveEmoji(_ emoji: DocumentModel.Emoji, by offset: CGSize) {
         guard let index = emojiArtModel.emojis.index(matching: emoji) else {
             return
         }
@@ -130,7 +130,7 @@ class EmojiArtViewModel: ObservableObject {
         emojiArtModel.emojis[index].y = emoji.y + Int(offset.height)
     }
     
-    func scaleEmoji(_ emoji: EmojiArtModel.Emoji, by scale: CGFloat) {
+    func scaleEmoji(_ emoji: DocumentModel.Emoji, by scale: CGFloat) {
         guard let index = emojiArtModel.emojis.index(matching: emoji) else {
             return
         }
@@ -142,7 +142,7 @@ class EmojiArtViewModel: ObservableObject {
         )
     }
     
-    func remove(_ emoji: EmojiArtModel.Emoji) {
+    func remove(_ emoji: DocumentModel.Emoji) {
         emojiArtModel.remove(emoji)
     }
 }
