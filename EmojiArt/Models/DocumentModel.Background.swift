@@ -1,6 +1,6 @@
 import Foundation
 
-extension EmojiArtModel {
+extension DocumentModel {
     enum Background: Equatable, Codable {
         case blank
         case url(URL)

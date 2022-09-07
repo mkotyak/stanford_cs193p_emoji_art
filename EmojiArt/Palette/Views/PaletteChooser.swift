@@ -29,7 +29,9 @@ struct PaletteChooser: View {
             Image(systemName: "paintpalette")
         }
         .font(emojiFont)
-        .contextMenu { contextMenu }
+        .contextMenu {
+            contextMenu
+        }
     }
 
     @ViewBuilder
@@ -39,6 +41,7 @@ struct PaletteChooser: View {
         }
         AnimatedActionButton(title: "New", systemImage: "plus") {
             store.insertPalette(named: "New", emojis: "", at: chosenPaletteIndex)
+            paletteToEdit = store.palette(at: chosenPaletteIndex)
         }
         AnimatedActionButton(title: "Delete", systemImage: "minus.circle") {
             chosenPaletteIndex = store.removePalette(at: chosenPaletteIndex)
@@ -78,7 +81,7 @@ struct PaletteChooser: View {
         }
         .id(palette.id)
         .transition(rollTransition)
-        .popover(item: $paletteToEdit) { _ in
+        .popover(item: $paletteToEdit) { palette in
             PaletteEditor(palette: $store.palettes[palette])
         }
         .sheet(isPresented: $managing) {
@@ -86,7 +89,6 @@ struct PaletteChooser: View {
         }
     }
 }
-
 
 // MARK: - Preview
 

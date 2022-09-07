@@ -14,7 +14,7 @@ struct PaletteManager: View {
                             Text(palette.name)
                             Text(palette.emojis)
                         }
-//                        hint for the homework
+//                        hint for the homework when I need to click on item in the edit mode
 //                        .gesture(editMode == .active ? tap : nil)
                     }
                 }
@@ -46,7 +46,7 @@ struct PaletteManager: View {
         }
     }
 
-//    hint for the homework
+//    hint for the homework when I need to click on item in the edit mode
 //    var tap: some Gesture {
 //        TapGesture()
 //            .onEnded {

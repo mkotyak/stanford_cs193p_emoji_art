@@ -1,15 +1,15 @@
 import SwiftUI
 
-struct EmojiArtDocumentView: View {
+struct DocumentView: View {
     enum Constants {
         static let defaultEmojiFontSize: CGFloat = 40
         static let frameScale: CGFloat = 1.2
     }
 
     @State private var alertToShow: IdentifiableAlert?
-    @State private var selectedEmojis: Set<EmojiArtModel.Emoji> = .init()
+    @State private var selectedEmojis: Set<DocumentModel.Emoji> = .init()
 
-    @ObservedObject var documentViewModel: EmojiArtViewModel
+    @ObservedObject var documentViewModel: DocumentViewModel
 
     var body: some View {
         VStack(spacing: 0) {
@@ -87,7 +87,7 @@ struct EmojiArtDocumentView: View {
         })
     }
 
-    private func unselect(_ emoji: EmojiArtModel.Emoji) {
+    private func unselect(_ emoji: DocumentModel.Emoji) {
         guard selectedEmojis.contains(emoji) else {
             return
         }
@@ -96,7 +96,7 @@ struct EmojiArtDocumentView: View {
         debugPrint("Selected emojis count after removing: \(selectedEmojis.count)")
     }
 
-    private func didSelect(_ emoji: EmojiArtModel.Emoji) {
+    private func didSelect(_ emoji: DocumentModel.Emoji) {
         debugPrint("\(emoji.text) emoji has been selected")
 
         guard !selectedEmojis.contains(emoji) else {
@@ -109,7 +109,7 @@ struct EmojiArtDocumentView: View {
         debugPrint("Selected emojis count after insertion: \(selectedEmojis.count)")
     }
 
-    private func fontSize(for emoji: EmojiArtModel.Emoji) -> CGFloat {
+    private func fontSize(for emoji: DocumentModel.Emoji) -> CGFloat {
         CGFloat(emoji.size)
     }
 
@@ -140,7 +140,7 @@ struct EmojiArtDocumentView: View {
 
     // MARK: - Position
 
-    private func position(for emoji: EmojiArtModel.Emoji, in geometry: GeometryProxy) -> CGPoint {
+    private func position(for emoji: DocumentModel.Emoji, in geometry: GeometryProxy) -> CGPoint {
         debugPrint("EMOJI POSITION: ", emoji)
         debugPrint("GLOBAL ZOOM SCALE", globalZoomScale)
         return convertFromEmojiCoordinates((emoji.x, emoji.y), in: geometry)
@@ -197,7 +197,7 @@ struct EmojiArtDocumentView: View {
             }
     }
 
-    private func dragSingle(_ emoji: EmojiArtModel.Emoji) -> some Gesture {
+    private func dragSingle(_ emoji: DocumentModel.Emoji) -> some Gesture {
         DragGesture()
             .updating($gesturePanOffset) { latestDragGestureValue, _, _ in
                 documentViewModel.moveEmoji(emoji, by: latestDragGestureValue.translation)
@@ -270,6 +270,6 @@ struct EmojiArtDocumentView: View {
 
 struct EmojiArtDocumentView_Previews: PreviewProvider {
     static var previews: some View {
-        EmojiArtDocumentView(documentViewModel: EmojiArtViewModel())
+        DocumentView(documentViewModel: DocumentViewModel())
     }
 }

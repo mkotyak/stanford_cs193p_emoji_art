@@ -1,6 +1,6 @@
 import Foundation
 
-struct EmojiArtModel: Codable {
+struct DocumentModel: Codable {
     
     struct Emoji: Identifiable, Hashable, Codable {
         var id = UUID()
@@ -22,12 +22,12 @@ struct EmojiArtModel: Codable {
     
     
     init(json: Data) throws {
-        self = try JSONDecoder().decode(EmojiArtModel.self, from: json)
+        self = try JSONDecoder().decode(DocumentModel.self, from: json)
     }
     
     init(url: URL) throws {
         let data = try Data(contentsOf: url)
-        self = try EmojiArtModel(json: data)
+        self = try DocumentModel(json: data)
     }
     
     init() {}
@@ -47,7 +47,7 @@ struct EmojiArtModel: Codable {
         )
     }
     
-    mutating func remove(_ emoji: EmojiArtModel.Emoji) {
+    mutating func remove(_ emoji: DocumentModel.Emoji) {
         emojis.remove(emoji)
     }
 }
